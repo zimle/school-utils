@@ -1,0 +1,9 @@
+{
+  "name": "school-utils",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/klammer-rechner.test.js",
+    "build": "node scripts/build.js"
+  }
+}
