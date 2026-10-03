@@ -25,12 +25,20 @@ function randomInt(min, max, random) {
   return Math.floor(random() * (max - min + 1)) + min;
 }
 
+function keepThreeDigitDividendEasy(dividend, baseMultiple) {
+  if (dividend < 100 || dividend > 999 || dividend % 10 === 0) return dividend;
+  // Round up to a multiple of both the required divisors and 10.
+  const step = lcmFromPrimeFactors(baseMultiple, 10);
+  return Math.ceil(dividend / step) * step;
+}
+
 // random ist injizierbar, damit alle Erzeugungszweige reproduzierbar testbar sind.
 export function makeProblemPair(random = Math.random) {
   if (random() < 0.5) {
     const divisor = randomInt(2, 9, random);
     const addend = randomInt(1, 9, random);
-    const dividend = lcmFromPrimeFactors(divisor, divisor + addend) * randomInt(1, 4, random);
+    const baseMultiple = lcmFromPrimeFactors(divisor, divisor + addend);
+    const dividend = keepThreeDigitDividendEasy(baseMultiple * randomInt(1, 4, random), baseMultiple);
     return [
       { text: `${dividend} : ${divisor} + ${addend}`, answer: dividend / divisor + addend },
       { text: `${dividend} : (${divisor} + ${addend})`, answer: dividend / (divisor + addend) }
@@ -43,7 +51,10 @@ export function makeProblemPair(random = Math.random) {
   const commonMultiple = lcmFromPrimeFactors(divisor, parenthesizedDivisor);
   // a/d - c >= 0: the multiplier is at least ceil(c / (kgV/d)).
   const minMultiplier = Math.ceil(subtrahend / (commonMultiple / divisor));
-  const dividend = commonMultiple * (minMultiplier + randomInt(0, 3, random));
+  const dividend = keepThreeDigitDividendEasy(
+    commonMultiple * (minMultiplier + randomInt(0, 3, random)),
+    commonMultiple
+  );
   return [
     { text: `${dividend} : ${divisor} − ${subtrahend}`, answer: dividend / divisor - subtrahend },
     { text: `${dividend} : (${divisor} − ${subtrahend})`, answer: dividend / parenthesizedDivisor }
